@@ -25,6 +25,7 @@ class LinkedList {
         if (this.tail !== null) this.tail.next = node;
 
         this.tail = node;
+        this.length +=1;
     }
 
     /** unshift(val): add new value to start of list. */
@@ -33,34 +34,45 @@ class LinkedList {
 
         if (this.head === null) {
             this.head = node;
+            node.next = null;
+            this.tail = node;
         }
         else {
+            node.next = this.head;
             this.head = this.head.next;
             this.head = node;
         }
+
+        this.length +=1;
     }
 
     /** return previous node to the given search value */
     findPrevious(val) {
         let current = this.head;
         let previous = null;
-
         while (current !== null) {
-            if (current.val === val) return previous;
-
+            if (current.val === val.val) {
+                return previous;
+            }
             previous = current;
             current = current.next;
         }
-
-        return previous;
     }
 
     /** pop(): return & remove last item. */
     pop() {
+        if (this.head === this.tail) {
+            const last = this.tail;
+            this.tail = null;
+            this.head = null;
+            this.length = 0;
+            return last.val;
+        }
         const last = this.tail;
-
         let secondToLast = this.findPrevious(last);
         secondToLast.next = null;
+        this.tail = secondToLast;
+        this.length -=1;
 
         return last.val;
     }
@@ -68,10 +80,12 @@ class LinkedList {
     /** shift(): return & remove first item. */
     shift() {
         const first = this.head;
-        const second = first.next;
-        this.head = second;
-
-        return first;
+        this.head = first.next;
+        if (this.head === null) {
+            this.tail = null;
+        }
+        this.length -=1;
+        return first.val;
     }
 
     /** getAt(idx): get val at idx. */
@@ -91,7 +105,7 @@ class LinkedList {
             current = current.next;
         }
 
-        return current.vl
+        return current.val
     }
 
     /** setAt(idx, val): set val at idx to val */
@@ -122,20 +136,34 @@ class LinkedList {
 
         let count = 0;
         let current = this.head;
-        let previous = null;
+        if (current === null) {
+            const node = new Node(val);
+            node.next = null;
+            this.head = node;
+            this.tail = node;
+            this.length = 1;
+        } 
+        else {
+            let previous = null;
 
-        while (count < idx) {
-            if (current === null) {
-                throw Error;
+            while (count < idx) {
+                if (current === null) {
+                    throw Error;
+                }
+                previous = current;
+                current = current.next;
+                count += 1;
             }
-            count += 1;
-            previous = current;
-            current = current.next;
+    
+            const node = new Node(val);
+            node.next = current;
+            previous.next = node;
+    
+            if (idx === this.length) {
+                this.tail = node;
+            }
+            this.length +=1;
         }
-
-        const node = new Node(val);
-        node.next = current;
-        previous.next = node;
     }
 
     /** removeAt(idx): return & remove item at idx, */
@@ -156,25 +184,37 @@ class LinkedList {
             previous = current;
             current = current.next;
         }
-
-        previous.next = current.next;
+        if (previous === null) {
+            this.head = null;
+            this.tail = null;
+            this.length = 0;
+        }
+        else {
+            previous.next = current.next;
+        }
         return current.val;
     }
 
     /** average(): return an average of all values in the list */
     average() {
         const last = this.tail;
-        let sum = null;
-        let count = 0;
-        let current = this.head;
-
-        while (current !== last) {
-            sum += current.val;
-            count += 1;
-            current = current.next;
+        if (last === null) {
+            return 0;
         }
-
-        return (sum / count);
+        else {
+            let sum = null;
+            let count = 1;
+            let current = this.head;
+    
+            while (current !== last) {
+                sum += current.val;
+                count += 1;
+                current = current.next;
+            }
+            sum += last.val;
+            console.log(sum, count)
+            return (sum / count);
+        }
     }
 }
 
